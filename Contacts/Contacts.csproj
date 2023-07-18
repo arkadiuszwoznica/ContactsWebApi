@@ -16,9 +16,11 @@
   <ItemGroup>
     <None Remove="Domain\" />
     <None Remove="DTOs\" />
+    <None Remove="Infrastructure\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Domain\" />
     <Folder Include="DTOs\" />
+    <Folder Include="Infrastructure\" />
   </ItemGroup>
 </Project>
