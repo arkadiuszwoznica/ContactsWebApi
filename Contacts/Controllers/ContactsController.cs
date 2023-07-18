@@ -3,9 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace Contacts.Controllers
 {
 	[ApiController]
-	public class ContactsController : Controller
+	[Route("api/contacts")]
+	public class ContactsController : ControllerBase
 	{
-		[HttpGet("api/contacts")]
+		[HttpGet]
 		public IActionResult Get()
 		{
 			return new JsonResult(
