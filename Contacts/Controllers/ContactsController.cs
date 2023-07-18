@@ -1,18 +1,24 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
-using Contacts.Infrastructure;
+using Contacts.WebAPI.Infrastructure;
 namespace Contacts.Controllers
 {
 	[ApiController]
 	[Route("api/contacts")]
 	public class ContactsController : ControllerBase
 	{
+		private readonly DataService _dataService;
+		public ContactsController(DataService dataService)
+		{
+			_dataService = dataService;
+		}
+
 
 		[HttpGet]
 		public IActionResult Get()
 		{
 			return new JsonResult(
-				DataService.Instance.Contacts
+				_dataService.Contacts
 			);
 		}
 	}

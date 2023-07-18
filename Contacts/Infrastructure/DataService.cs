@@ -1,14 +1,12 @@
 ﻿using System;
 using Contacts.Domain;
-namespace Contacts.Infrastructure
+namespace Contacts.WebAPI.Infrastructure
 {
 	public class DataService
 	{
 		public List<Contact> Contacts { get; }
 
-		public static DataService Instance { get; } = new DataService();
-
-		private DataService()
+		public DataService()
 		{
 			Contacts = new List<Contact>()
 			{
