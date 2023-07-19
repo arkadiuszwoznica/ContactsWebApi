@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.JsonPatch;
 using Contacts.WebAPI.Infrastructure;
 using Contacts.DTOs;
 using Contacts.Domain;
@@ -60,6 +61,7 @@ namespace Contacts.Controllers
             return Ok(contactDto);
         }
 
+
 		[HttpPost]
 		public IActionResult CreateContact([FromBody] ContactForCreationDto contactForCreationDto)
 		{
@@ -96,6 +98,7 @@ namespace Contacts.Controllers
             return CreatedAtAction(nameof(GetContact), new { id = contact.Id }, contactDto);
         }
 
+
 		[HttpPut("{id:int}")]
 		public IActionResult UpdateContact(int id, [FromBody] ContactForUpdateDto contactForUpdateDto)
 		{
@@ -115,6 +118,7 @@ namespace Contacts.Controllers
 			return NoContent();
         }
 
+
 		[HttpDelete("{id:int}")]
         public IActionResult DeleteContact(int id)
         {
@@ -131,5 +135,39 @@ namespace Contacts.Controllers
 
             return NoContent();
         }
+
+
+		[HttpPatch("{id:int}")]
+		public IActionResult PartiallyUpdateContatc(int id, [FromBody] JsonPatchDocument<ContactForUpdateDto> patchDocument)
+		{
+            var contact = _dataService
+                .Contacts
+                .FirstOrDefault(c => c.Id == id);
+
+            if (contact is null)
+            {
+                return NotFound();
+            }
+
+			var contactToBePatched = new ContactForUpdateDto()
+			{
+				FirstName = contact.FirstName,
+				LastName = contact.LastName,
+				Email = contact.Email
+			};
+
+			patchDocument.ApplyTo(contactToBePatched, ModelState);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+			contact.FirstName = contactToBePatched.FirstName;
+            contact.LastName = contactToBePatched.LastName;
+            contact.Email = contactToBePatched.Email;
+
+            return NoContent();
+		}
     }
 }
