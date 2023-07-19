@@ -25,11 +25,13 @@
     <None Remove="DTOs\" />
     <None Remove="Infrastructure\" />
     <None Remove="Tests\" />
+    <None Remove="Infrastructure\Migrations\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Domain\" />
     <Folder Include="DTOs\" />
     <Folder Include="Infrastructure\" />
     <Folder Include="Tests\" />
+    <Folder Include="Infrastructure\Migrations\" />
   </ItemGroup>
 </Project>

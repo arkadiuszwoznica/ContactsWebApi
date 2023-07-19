@@ -1,10 +1,17 @@
 ﻿using Contacts.WebAPI.Infrastructure;
+using Contacts.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.JsonPatch;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddDbContext<ContactsDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ContactsDb"));
+    options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
+});
 
 builder.Services.AddSingleton<DataService>();
 builder.Services.AddControllers().AddNewtonsoftJson();
