@@ -27,5 +27,27 @@ namespace Contacts.Controllers
 			});
 			return Ok(contactsDto);
 		}
+
+		[HttpGet("{id:int}")]
+		public ActionResult<ContactDto> Get(int id)
+		{
+			var contact = _dataService.Contacts
+				.FirstOrDefault(c => c.Id == id);
+
+			if (contact is null)
+			{
+				return NotFound();
+			}
+
+			var contactDto = new ContactDto()
+				{
+					Id = contact.Id,
+					FirstName = contact.FirstName,
+					LastName = contact.LastName,
+					Email = contact.Email
+				};
+
+            return Ok(contactDto);
+        }
 	}
 }
