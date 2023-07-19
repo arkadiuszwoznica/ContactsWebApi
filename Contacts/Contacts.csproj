@@ -19,10 +19,12 @@
     <None Remove="Domain\" />
     <None Remove="DTOs\" />
     <None Remove="Infrastructure\" />
+    <None Remove="Tests\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Domain\" />
     <Folder Include="DTOs\" />
     <Folder Include="Infrastructure\" />
+    <Folder Include="Tests\" />
   </ItemGroup>
 </Project>
