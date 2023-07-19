@@ -63,6 +63,16 @@ namespace Contacts.Controllers
 		[HttpPost]
 		public IActionResult CreateContact([FromBody] ContactForCreationDto contactForCreationDto)
 		{
+			if(contactForCreationDto.FirstName == contactForCreationDto.LastName)
+			{
+				ModelState.AddModelError("wrongName", "firstname and lastname cannot be the same");
+			}
+
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+
 			var maxId = _dataService.Contacts.Max(c => c.Id);
 
             var contact = new Contact()
