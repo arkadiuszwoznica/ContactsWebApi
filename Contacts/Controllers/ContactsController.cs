@@ -114,5 +114,22 @@ namespace Contacts.Controllers
 
 			return NoContent();
         }
+
+		[HttpDelete("{id:int}")]
+        public IActionResult DeleteContact(int id)
+        {
+            var contact = _dataService
+                .Contacts
+                .FirstOrDefault(c => c.Id == id);
+
+            if (contact is null)
+            {
+                return NotFound();
+            }
+
+			_dataService.Contacts.Remove(contact);
+
+            return NoContent();
+        }
     }
 }
