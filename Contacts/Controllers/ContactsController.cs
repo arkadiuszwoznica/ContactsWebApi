@@ -163,7 +163,12 @@ namespace Contacts.Controllers
                 return BadRequest(ModelState);
             }
 
-			contact.FirstName = contactToBePatched.FirstName;
+			if (!TryValidateModel(contactToBePatched))
+			{
+				return BadRequest(ModelState);
+            }
+
+            contact.FirstName = contactToBePatched.FirstName;
             contact.LastName = contactToBePatched.LastName;
             contact.Email = contactToBePatched.Email;
 
