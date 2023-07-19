@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Contacts.WebAPI.Infrastructure;
 using Contacts.DTOs;
+using Contacts.Domain;
+
 namespace Contacts.Controllers
 {
 	[ApiController]
@@ -16,9 +18,16 @@ namespace Contacts.Controllers
 
 
 		[HttpGet]
-		public ActionResult<IEnumerable<ContactDto>> GetAll()
+		public ActionResult<IEnumerable<ContactDto>> GetAllContacts([FromQuery] string? search)
 		{
-			var contactsDto = _dataService.Contacts.Select(c => new ContactDto
+			var query = _dataService.Contacts.AsQueryable();
+
+			if(!string.IsNullOrWhiteSpace(search))
+			{
+				query = query.Where(c => c.LastName.Contains(search));
+			}
+
+			var contactsDto = query.Select(c => new ContactDto
 			{
 				Id = c.Id,
 				FirstName = c.FirstName,
@@ -28,8 +37,9 @@ namespace Contacts.Controllers
 			return Ok(contactsDto);
 		}
 
+
 		[HttpGet("{id:int}")]
-		public ActionResult<ContactDto> Get(int id)
+		public ActionResult<ContactDto> GetContact(int id)
 		{
 			var contact = _dataService.Contacts
 				.FirstOrDefault(c => c.Id == id);
@@ -48,6 +58,32 @@ namespace Contacts.Controllers
 				};
 
             return Ok(contactDto);
+        }
+
+		[HttpPost]
+		public IActionResult CreateContact([FromBody] ContactForCreationDto contactForCreationDto)
+		{
+			var maxId = _dataService.Contacts.Max(c => c.Id);
+
+            var contact = new Contact()
+            {
+                Id = maxId +1,
+                FirstName = contactForCreationDto.FirstName,
+                LastName = contactForCreationDto.LastName,
+                Email = contactForCreationDto.Email
+            };
+
+			_dataService.Contacts.Add(contact);
+
+            var contactDto = new ContactDto()
+            {
+                Id = contact.Id,
+                FirstName = contact.FirstName,
+                LastName = contact.LastName,
+                Email = contact.Email
+            };
+
+            return CreatedAtAction(nameof(GetContact), new { id = contact.Id }, contactDto);
         }
 	}
 }
