@@ -95,5 +95,24 @@ namespace Contacts.Controllers
 
             return CreatedAtAction(nameof(GetContact), new { id = contact.Id }, contactDto);
         }
-	}
+
+		[HttpPut("{id:int}")]
+		public IActionResult UpdateContact(int id, [FromBody] ContactForUpdateDto contactForUpdateDto)
+		{
+			var contact = _dataService
+				.Contacts
+				.FirstOrDefault(c => c.Id == id);
+
+            if (contact is null)
+            {
+                return NotFound();
+            }
+
+			contact.FirstName = contactForUpdateDto.FirstName;
+            contact.LastName = contactForUpdateDto.LastName;
+            contact.Email = contactForUpdateDto.Email;
+
+			return NoContent();
+        }
+    }
 }
