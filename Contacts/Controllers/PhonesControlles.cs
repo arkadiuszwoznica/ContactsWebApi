@@ -39,6 +39,35 @@ namespace Contacts.Controllers
 
             return Ok(phonesDto);
         }
+
+        [HttpGet("{phoneId:int}")]
+        public ActionResult<PhoneDto> GetPhone(int contactId, int phoneId)
+        {
+            var contact = _dataService.Contacts
+                .FirstOrDefault(c => c.Id == contactId);
+
+            if (contact is null)
+            {
+                return NotFound();
+            }
+
+            var phoneDto = contact.Phones
+                .Where(p => p.Id == phoneId)
+                .Select(p => new PhoneDto()
+                {
+                    Id = p.Id,
+                    Number = p.Number,
+                    Description = p.Description
+                })
+                .FirstOrDefault();
+
+            if (phoneDto is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(phoneDto);
+        }
     }
 
 }
