@@ -126,7 +126,7 @@ namespace Contacts.Controllers
 		[HttpDelete("{id:int}")]
         public IActionResult DeleteContact(int id)
         {
-            var contact = _dataService
+            var contact = _dbContext
                 .Contacts
                 .FirstOrDefault(c => c.Id == id);
 
@@ -135,7 +135,8 @@ namespace Contacts.Controllers
                 return NotFound();
             }
 
-			_dataService.Contacts.Remove(contact);
+            _dbContext.Contacts.Remove(contact);
+            _dbContext.SaveChanges();
 
             return NoContent();
         }
