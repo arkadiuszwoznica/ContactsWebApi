@@ -1,8 +1,19 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using Contacts.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddDbContext<ContactsDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ContactsDb"));
+    options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
+});
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+{
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
