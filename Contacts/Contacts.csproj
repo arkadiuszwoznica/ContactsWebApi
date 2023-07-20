@@ -26,6 +26,7 @@
     <None Remove="Infrastructure\" />
     <None Remove="Tests\" />
     <None Remove="Infrastructure\Migrations\" />
+    <None Remove="Infrastructure\Repositories\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Domain\" />
@@ -33,5 +34,6 @@
     <Folder Include="Infrastructure\" />
     <Folder Include="Tests\" />
     <Folder Include="Infrastructure\Migrations\" />
+    <Folder Include="Infrastructure\Repositories\" />
   </ItemGroup>
 </Project>
