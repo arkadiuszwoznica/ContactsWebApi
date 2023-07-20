@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.JsonPatch;
 using Contacts.WebAPI.Infrastructure;
+using Contacts.Infrastructure;
 using Contacts.DTOs;
 using Contacts.Domain;
 
@@ -12,16 +13,19 @@ namespace Contacts.Controllers
 	public class ContactsController : ControllerBase
 	{
 		private readonly DataService _dataService;
-		public ContactsController(DataService dataService)
+        private readonly ContactsDbContext _dbContext;
+
+        public ContactsController(DataService dataService, ContactsDbContext dbContext)
 		{
 			_dataService = dataService;
+			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 		}
 
 
 		[HttpGet]
 		public ActionResult<IEnumerable<ContactDto>> GetAllContacts([FromQuery] string? search)
 		{
-			var query = _dataService.Contacts.AsQueryable();
+			var query = _dbContext.Contacts.AsQueryable();
 
 			if(!string.IsNullOrWhiteSpace(search))
 			{
@@ -42,7 +46,7 @@ namespace Contacts.Controllers
 		[HttpGet("{id:int}")]
 		public ActionResult<ContactDto> GetContact(int id)
 		{
-			var contact = _dataService.Contacts
+			var contact = _dbContext.Contacts
 				.FirstOrDefault(c => c.Id == id);
 
 			if (contact is null)
