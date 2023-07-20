@@ -106,7 +106,7 @@ namespace Contacts.Controllers
 		[HttpPut("{id:int}")]
 		public IActionResult UpdateContact(int id, [FromBody] ContactForUpdateDto contactForUpdateDto)
 		{
-			var contact = _dataService
+			var contact = _dbContext
 				.Contacts
 				.FirstOrDefault(c => c.Id == id);
 
@@ -118,6 +118,8 @@ namespace Contacts.Controllers
 			contact.FirstName = contactForUpdateDto.FirstName;
             contact.LastName = contactForUpdateDto.LastName;
             contact.Email = contactForUpdateDto.Email;
+
+			_dbContext.SaveChanges();
 
 			return NoContent();
         }
@@ -145,7 +147,7 @@ namespace Contacts.Controllers
 		[HttpPatch("{id:int}")]
 		public IActionResult PartiallyUpdateContatc(int id, [FromBody] JsonPatchDocument<ContactForUpdateDto> patchDocument)
 		{
-            var contact = _dataService
+            var contact = _dbContext
                 .Contacts
                 .FirstOrDefault(c => c.Id == id);
 
@@ -176,6 +178,8 @@ namespace Contacts.Controllers
             contact.FirstName = contactToBePatched.FirstName;
             contact.LastName = contactToBePatched.LastName;
             contact.Email = contactToBePatched.Email;
+
+            _dbContext.SaveChanges();
 
             return NoContent();
 		}
