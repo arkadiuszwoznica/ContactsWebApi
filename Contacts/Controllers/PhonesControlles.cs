@@ -1,9 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using Contacts.Domain;
 using Contacts.DTOs;
 using Contacts.Infrastructure;
-using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Contacts.Controllers

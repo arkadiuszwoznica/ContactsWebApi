@@ -1,7 +1,5 @@
 ﻿using Contacts.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.JsonPatch;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
