@@ -1,4 +1,5 @@
-﻿using Contacts.Infrastructure;
+﻿using System.Reflection;
+using Contacts.Infrastructure;
 using Contacts.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +18,8 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 });
 
 builder.Services.AddScoped<IContactsRepository, ContactsRepository>();
+
+builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

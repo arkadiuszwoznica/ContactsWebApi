@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.JsonPatch;
+using AutoMapper;
 using Contacts.Infrastructure;
 using Contacts.DTOs;
 using Contacts.Domain;
@@ -14,11 +15,12 @@ namespace Contacts.Controllers
 	public class ContactsController : ControllerBase
 	{
         private readonly IContactsRepository _repository;
+        private readonly IMapper _mapper;
 
-
-        public ContactsController(IContactsRepository repository)
+        public ContactsController(IContactsRepository repository, IMapper mapper)
 		{
             _repository = repository;
+            _mapper = mapper;
 		}
 
 
@@ -28,14 +30,7 @@ namespace Contacts.Controllers
         public ActionResult<IEnumerable<ContactDto>> GetAllContacts([FromQuery] string? search)
 		{
             var contacts = _repository.GetContacts(search);
-
-			var contactsDto = contacts.Select(c => new ContactDto
-			{
-				Id = c.Id,
-				FirstName = c.FirstName,
-				LastName = c.LastName,
-				Email = c.Email
-			});
+            var contactsDto = _mapper.Map<IEnumerable<ContactDto>>(contacts);
 			return Ok(contactsDto);
 		}
 
@@ -53,21 +48,7 @@ namespace Contacts.Controllers
 				return NotFound();
 			}
 
-			var contactDto = new ContactsDetailsDto()
-				{
-					Id = contact.Id,
-					FirstName = contact.FirstName,
-					LastName = contact.LastName,
-					Email = contact.Email,
-					Phones = contact.Phones
-					.Select(p => new PhoneDto()
-					{
-						Id = p.Id,
-						Number = p.Number,
-						Description = p.Description
-					}).ToList()
-				};
-
+            var contactDto = _mapper.Map<ContactsDetailsDto>(contact);
             return Ok(contactDto);
         }
 
