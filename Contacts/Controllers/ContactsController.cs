@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.JsonPatch;
 using Contacts.Infrastructure;
 using Contacts.DTOs;
@@ -41,9 +42,9 @@ namespace Contacts.Controllers
 
 
 		[HttpGet("{id:int}")]
-		public ActionResult<ContactDto> GetContact(int id)
+		public ActionResult<ContactsDetailsDto> GetContact(int id)
 		{
-			var contact = _dbContext.Contacts
+			var contact = _dbContext.Contacts.Include(c => c.Phones)
 				.FirstOrDefault(c => c.Id == id);
 
 			if (contact is null)
@@ -51,12 +52,19 @@ namespace Contacts.Controllers
 				return NotFound();
 			}
 
-			var contactDto = new ContactDto()
+			var contactDto = new ContactsDetailsDto()
 				{
 					Id = contact.Id,
 					FirstName = contact.FirstName,
 					LastName = contact.LastName,
-					Email = contact.Email
+					Email = contact.Email,
+					Phones = contact.Phones
+					.Select(p => new PhoneDto()
+					{
+						Id = p.Id,
+						Number = p.Number,
+						Description = p.Description
+					}).ToList()
 				};
 
             return Ok(contactDto);
