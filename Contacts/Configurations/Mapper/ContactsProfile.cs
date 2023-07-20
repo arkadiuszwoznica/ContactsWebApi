@@ -11,7 +11,9 @@ namespace Contacts.Configurations.Mapper
 			CreateMap<Contact, ContactDto>();
 			CreateMap<Contact, ContactsDetailsDto>();
 			CreateMap<Phone, PhoneDto>();
-		}
-	}
+            CreateMap<ContactForCreationDto, Contact>();
+            CreateMap<ContactForUpdateDto, Contact>().ReverseMap();
+        }
+    }
 }
 
