@@ -21,7 +21,9 @@ namespace Contacts.Controllers
 
 
 		[HttpGet]
-		public ActionResult<IEnumerable<ContactDto>> GetAllContacts([FromQuery] string? search)
+		[ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public ActionResult<IEnumerable<ContactDto>> GetAllContacts([FromQuery] string? search)
 		{
 			var query = _dbContext.Contacts.AsQueryable();
 
@@ -42,7 +44,10 @@ namespace Contacts.Controllers
 
 
 		[HttpGet("{id:int}")]
-		public ActionResult<ContactsDetailsDto> GetContact(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public ActionResult<ContactsDetailsDto> GetContact(int id)
 		{
 			var contact = _dbContext.Contacts.Include(c => c.Phones)
 				.FirstOrDefault(c => c.Id == id);
@@ -72,7 +77,10 @@ namespace Contacts.Controllers
 
 
 		[HttpPost]
-		public IActionResult CreateContact([FromBody] ContactForCreationDto contactForCreationDto)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult CreateContact([FromBody] ContactForCreationDto contactForCreationDto)
 		{
 			if(contactForCreationDto.FirstName == contactForCreationDto.LastName)
 			{
@@ -109,7 +117,11 @@ namespace Contacts.Controllers
 
 
 		[HttpPut("{id:int}")]
-		public IActionResult UpdateContact(int id, [FromBody] ContactForUpdateDto contactForUpdateDto)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult UpdateContact(int id, [FromBody] ContactForUpdateDto contactForUpdateDto)
 		{
 			var contact = _dbContext
 				.Contacts
@@ -131,6 +143,9 @@ namespace Contacts.Controllers
 
 
 		[HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult DeleteContact(int id)
         {
             var contact = _dbContext
@@ -150,7 +165,11 @@ namespace Contacts.Controllers
 
 
 		[HttpPatch("{id:int}")]
-		public IActionResult PartiallyUpdateContatc(int id, [FromBody] JsonPatchDocument<ContactForUpdateDto> patchDocument)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult PartiallyUpdateContatc(int id, [FromBody] JsonPatchDocument<ContactForUpdateDto> patchDocument)
 		{
             var contact = _dbContext
                 .Contacts

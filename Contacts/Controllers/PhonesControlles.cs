@@ -18,6 +18,8 @@ namespace Contacts.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public ActionResult<IEnumerable<PhoneDto>> GetPhones(int contactId)
         {
             var contact = _dbContext.Contacts.Include(c => c.Phones)
@@ -40,6 +42,9 @@ namespace Contacts.Controllers
         }
 
         [HttpGet("{phoneId:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public ActionResult<PhoneDto> GetPhone(int contactId, int phoneId)
         {
             var phones = _dbContext.Phones
