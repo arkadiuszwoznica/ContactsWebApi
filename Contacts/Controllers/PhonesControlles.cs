@@ -44,16 +44,15 @@ namespace Contacts.Controllers
         [HttpGet("{phoneId:int}")]
         public ActionResult<PhoneDto> GetPhone(int contactId, int phoneId)
         {
-            var contact = _dbContext.Contacts.Include(c => c.Phones)
-                .FirstOrDefault(c => c.Id == contactId);
+            var phones = _dbContext.Phones
+                .Where(p => p.ContactId == contactId && p.Id == phoneId);
 
-            if (contact is null)
+            if (phones is null)
             {
                 return NotFound();
             }
 
-            var phoneDto = contact.Phones
-                .Where(p => p.Id == phoneId)
+            var phoneDto = phones
                 .Select(p => new PhoneDto()
                 {
                     Id = p.Id,
