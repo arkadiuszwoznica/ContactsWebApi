@@ -1,5 +1,4 @@
-﻿using Contacts.WebAPI.Infrastructure;
-using Contacts.Infrastructure;
+﻿using Contacts.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.JsonPatch;
 
@@ -13,7 +12,6 @@ builder.Services.AddDbContext<ContactsDbContext>(options =>
     options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
 });
 
-builder.Services.AddSingleton<DataService>();
 builder.Services.AddControllers().AddNewtonsoftJson();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

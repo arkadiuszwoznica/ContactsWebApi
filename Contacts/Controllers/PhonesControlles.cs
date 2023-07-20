@@ -1,7 +1,8 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore;
 using Contacts.Domain;
 using Contacts.DTOs;
-using Contacts.WebAPI.Infrastructure;
+using Contacts.Infrastructure;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,17 +12,17 @@ namespace Contacts.Controllers
     [Route("api/contacts/{contactId:int}/phones")]
     public class PhonesControlles : ControllerBase
     {
-        private readonly DataService _dataService;
+        private readonly ContactsDbContext _dbContext;
 
-        public PhonesControlles(DataService dataService)
+        public PhonesControlles(ContactsDbContext dbContext)
         {
-            _dataService = dataService;
+            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<PhoneDto>> GetPhones(int contactId)
         {
-            var contact = _dataService.Contacts
+            var contact = _dbContext.Contacts.Include(c => c.Phones)
                 .FirstOrDefault(c => c.Id == contactId);
 
             if (contact is null)
@@ -43,7 +44,7 @@ namespace Contacts.Controllers
         [HttpGet("{phoneId:int}")]
         public ActionResult<PhoneDto> GetPhone(int contactId, int phoneId)
         {
-            var contact = _dataService.Contacts
+            var contact = _dbContext.Contacts.Include(c => c.Phones)
                 .FirstOrDefault(c => c.Id == contactId);
 
             if (contact is null)
