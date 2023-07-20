@@ -1,9 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.JsonPatch;
 using AutoMapper;
-using Contacts.Infrastructure;
 using Contacts.DTOs;
 using Contacts.Domain;
 using Contacts.Infrastructure.Repositories;
