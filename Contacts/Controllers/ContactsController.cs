@@ -1,10 +1,10 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.JsonPatch;
-using Contacts.Infrastructure;
+using AutoMapper;
 using Contacts.DTOs;
 using Contacts.Domain;
+using Contacts.Infrastructure.Repositories;
 
 namespace Contacts.Controllers
 {
@@ -12,11 +12,13 @@ namespace Contacts.Controllers
 	[Route("api/contacts")]
 	public class ContactsController : ControllerBase
 	{
-        private readonly ContactsDbContext _dbContext;
+        private readonly IContactsRepository _repository;
+        private readonly IMapper _mapper;
 
-        public ContactsController(ContactsDbContext dbContext)
+        public ContactsController(IContactsRepository repository, IMapper mapper)
 		{
-			_dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            _repository = repository;
+            _mapper = mapper;
 		}
 
 
@@ -25,20 +27,8 @@ namespace Contacts.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public ActionResult<IEnumerable<ContactDto>> GetAllContacts([FromQuery] string? search)
 		{
-			var query = _dbContext.Contacts.AsQueryable();
-
-			if(!string.IsNullOrWhiteSpace(search))
-			{
-				query = query.Where(c => c.LastName.Contains(search));
-			}
-
-			var contactsDto = query.Select(c => new ContactDto
-			{
-				Id = c.Id,
-				FirstName = c.FirstName,
-				LastName = c.LastName,
-				Email = c.Email
-			});
+            var contacts = _repository.GetContacts(search);
+            var contactsDto = _mapper.Map<IEnumerable<ContactDto>>(contacts);
 			return Ok(contactsDto);
 		}
 
@@ -49,29 +39,14 @@ namespace Contacts.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public ActionResult<ContactsDetailsDto> GetContact(int id)
 		{
-			var contact = _dbContext.Contacts.Include(c => c.Phones)
-				.FirstOrDefault(c => c.Id == id);
+            var contact = _repository.GetContact(id);
 
 			if (contact is null)
 			{
 				return NotFound();
 			}
 
-			var contactDto = new ContactsDetailsDto()
-				{
-					Id = contact.Id,
-					FirstName = contact.FirstName,
-					LastName = contact.LastName,
-					Email = contact.Email,
-					Phones = contact.Phones
-					.Select(p => new PhoneDto()
-					{
-						Id = p.Id,
-						Number = p.Number,
-						Description = p.Description
-					}).ToList()
-				};
-
+            var contactDto = _mapper.Map<ContactsDetailsDto>(contact);
             return Ok(contactDto);
         }
 
@@ -92,25 +67,10 @@ namespace Contacts.Controllers
 				return BadRequest(ModelState);
 			}
 
-			var maxId = _dbContext.Contacts.Max(c => c.Id);
+            var contact = _mapper.Map<Contact>(contactForCreationDto);
+            _repository.CreateContact(contact);
 
-            var contact = new Contact()
-            {
-                FirstName = contactForCreationDto.FirstName,
-                LastName = contactForCreationDto.LastName,
-                Email = contactForCreationDto.Email
-            };
-
-            _dbContext.Contacts.Add(contact);
-			_dbContext.SaveChanges();
-
-            var contactDto = new ContactDto()
-            {
-                Id = contact.Id,
-                FirstName = contact.FirstName,
-                LastName = contact.LastName,
-                Email = contact.Email
-            };
+            var contactDto = _mapper.Map<ContactDto>(contact);
 
             return CreatedAtAction(nameof(GetContact), new { id = contact.Id }, contactDto);
         }
@@ -123,20 +83,15 @@ namespace Contacts.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult UpdateContact(int id, [FromBody] ContactForUpdateDto contactForUpdateDto)
 		{
-			var contact = _dbContext
-				.Contacts
-				.FirstOrDefault(c => c.Id == id);
+            var contact = _mapper.Map<Contact>(contactForUpdateDto);
+            contact.Id = id;
 
-            if (contact is null)
+            var success = _repository.UpdateContact(contact);
+
+            if (!success)
             {
                 return NotFound();
             }
-
-			contact.FirstName = contactForUpdateDto.FirstName;
-            contact.LastName = contactForUpdateDto.LastName;
-            contact.Email = contactForUpdateDto.Email;
-
-			_dbContext.SaveChanges();
 
 			return NoContent();
         }
@@ -148,17 +103,12 @@ namespace Contacts.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult DeleteContact(int id)
         {
-            var contact = _dbContext
-                .Contacts
-                .FirstOrDefault(c => c.Id == id);
+            var success = _repository.DeleteContact(id);
 
-            if (contact is null)
+            if (!success)
             {
                 return NotFound();
             }
-
-            _dbContext.Contacts.Remove(contact);
-            _dbContext.SaveChanges();
 
             return NoContent();
         }
@@ -171,21 +121,14 @@ namespace Contacts.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult PartiallyUpdateContatc(int id, [FromBody] JsonPatchDocument<ContactForUpdateDto> patchDocument)
 		{
-            var contact = _dbContext
-                .Contacts
-                .FirstOrDefault(c => c.Id == id);
+            var contact = _repository.GetContact(id);
 
             if (contact is null)
             {
                 return NotFound();
             }
 
-			var contactToBePatched = new ContactForUpdateDto()
-			{
-				FirstName = contact.FirstName,
-				LastName = contact.LastName,
-				Email = contact.Email
-			};
+            var contactToBePatched = _mapper.Map<ContactForUpdateDto>(contact);
 
 			patchDocument.ApplyTo(contactToBePatched, ModelState);
 
@@ -199,13 +142,16 @@ namespace Contacts.Controllers
 				return BadRequest(ModelState);
             }
 
-            contact.FirstName = contactToBePatched.FirstName;
-            contact.LastName = contactToBePatched.LastName;
-            contact.Email = contactToBePatched.Email;
+            _mapper.Map(contactToBePatched, contact);
 
-            _dbContext.SaveChanges();
+            var success = _repository.UpdateContact(contact);
+
+            if (!success)
+            {
+                return NotFound();
+            }
 
             return NoContent();
-		}
+        }
     }
 }
