@@ -52,6 +52,7 @@ builder.Services.AddControllers(configure =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddResponseCaching();
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 

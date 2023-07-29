@@ -5,6 +5,7 @@ using AutoMapper;
 using Contacts.DTOs;
 using Contacts.Domain;
 using Contacts.Infrastructure.Repositories;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Contacts.Controllers
 {
@@ -14,11 +15,13 @@ namespace Contacts.Controllers
 	{
         private readonly IContactsRepository _repository;
         private readonly IMapper _mapper;
+        private readonly IMemoryCache _memoryCache;
 
-        public ContactsController(IContactsRepository repository, IMapper mapper)
+        public ContactsController(IContactsRepository repository, IMapper mapper, IMemoryCache memoryCache)
 		{
             _repository = repository;
             _mapper = mapper;
+            _memoryCache = memoryCache;
 		}
 
 
@@ -37,17 +40,31 @@ namespace Contacts.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [ResponseCache(CacheProfileName = "Any-60")]
+        //[ResponseCache(CacheProfileName = "Any-60")]
         public ActionResult<ContactsDetailsDto> GetContact(int id)
 		{
-            var contact = _repository.GetContact(id);
+            var cacheKey = $"{nameof(ContactsController)}-{nameof(GetContact)}-{id}";
 
-			if (contact is null)
+
+            if (!_memoryCache.TryGetValue<ContactsDetailsDto>(cacheKey, out var contactDto))
+            {
+                var contact = _repository.GetContact(id);
+
+                if(contact is not null)
+                {
+                    contactDto = _mapper.Map<ContactsDetailsDto>(contact);
+
+                    _memoryCache.Set(cacheKey, contactDto, TimeSpan.FromSeconds(60));
+                }
+            }
+
+           // var contact = _repository.GetContact(id);
+
+			if (contactDto is null)
 			{
 				return NotFound();
 			}
 
-            var contactDto = _mapper.Map<ContactsDetailsDto>(contact);
             return Ok(contactDto);
         }
 
