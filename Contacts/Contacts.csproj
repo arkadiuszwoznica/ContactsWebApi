@@ -30,6 +30,7 @@
     <None Remove="Infrastructure\Repositories\" />
     <None Remove="Configurations\" />
     <None Remove="Configurations\Mapper\" />
+    <None Remove="Controllers\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Domain\" />
@@ -40,5 +41,6 @@
     <Folder Include="Infrastructure\Repositories\" />
     <Folder Include="Configurations\" />
     <Folder Include="Configurations\Mapper\" />
+    <Folder Include="Controllers\" />
   </ItemGroup>
 </Project>
