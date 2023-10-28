@@ -8,11 +8,12 @@ In accordance to good practices of coding I'm using LINQ, automapping and Reposi
 You can use swagger to try the api out. 
 
 
-# Program.cs
+# Architecture
+
+### Program.cs
 This file contains all needed configurations to this project.
 
-
-# Infrastucture/Repositories
+### Infrastucture/Repositories
 In this folder you can find two files - interface IContactRepository and ContactRepository class which implements methods included in interface.
 ContactRepository class is serving as a data repository for contacts. Key functionalities include:
 
@@ -24,3 +25,13 @@ ContactRepository class is serving as a data repository for contacts. Key functi
 - DeleteContact: Deletes a contact from the database.
 
 This class abstracts contact data management, relying on ContactsDbContext for database operations, what is an advanced practice of making code clean. 
+
+### Domain
+This folder contains classes of domain data types i use in this project.
+
+### DTOs
+In this folder you can find data transfer objects which i use to encapsulate the data that needs to be transferred and minimize the amount of data sent over a network.
+
+### Configurations/Mapper
+File from this folder helps me using DTOs in my project.
+
